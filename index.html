@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Handball Shot Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<style>
+:root{
+  color-scheme:light dark;
+  --bg:#E9EEF3;--card:#FFF;--fg:#141B24;--muted:#566372;--line:#2B3744;--line-soft:#93A0AD;
+  --court:#E8EFF5;--court-2:#D8E3ED;--area:#C6D7E8;--hair:#D3DAE1;--field:#F3F6F9;
+  --shadow:0 1px 2px rgba(20,27,36,.06),0 10px 24px -14px rgba(20,27,36,.35);
+  --accent:#17406B;--accent-ink:#FFF;--danger:#B42318;
+  --l1:#C93030;--l2:#D26A00;--l3:#2E8B47;--l4:#0F8EA3;--l5:#2F5FD0;--l6:#8E44C2;--dot-ink:#FFF;
+  --p:#C2185B;--p-ink:#FFF;--f:#141B24;--f-ink:#FFF;
+  --font-display:"Barlow Condensed","Cairo","Arial Narrow",Arial,sans-serif;
+  --font-body:"Barlow","Cairo","Segoe UI",system-ui,Arial,sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#0C1117;--card:#161D25;--fg:#E9EEF3;--muted:#9AA7B5;--line:#B7C4D1;--line-soft:#5A6876;
+  --court:#1F2A35;--court-2:#18212A;--area:#29394A;--hair:#27323E;--field:#0F151B;--shadow:none;
+  --accent:#8DB6E6;--accent-ink:#0B1520;--danger:#F97066;
+  --l1:#F0706B;--l2:#F5A04A;--l3:#5CC47A;--l4:#46C6DA;--l5:#7C9CF7;--l6:#C28FF0;--dot-ink:#0E1318;
+  --p:#F06292;--p-ink:#1A0710;--f:#E9EEF3;--f-ink:#0E1318;}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:15px;line-height:1.5;
+  padding-block:20px 44px;padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto}
+[dir=rtl] *{letter-spacing:0!important}
+.top{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+h1{font-family:var(--font-display);font-size:36px;line-height:1.1;margin:0;font-weight:700}
+.sub{margin:6px 0 0;color:var(--muted);font-size:13.5px;max-width:64ch}
+h2{font-family:var(--font-display);font-size:26px;margin:26px 0 12px;font-weight:700}
+input,textarea,select{font:inherit;color:var(--fg);background:var(--field);border:1px solid var(--hair);border-radius:9px;padding:8px 11px;min-width:0}
+input::placeholder,textarea::placeholder{color:var(--muted);opacity:.75}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{font:600 13px var(--font-body);min-height:36px;padding:5px 13px;border:1px solid var(--hair);background:var(--card);color:var(--fg);border-radius:9px;cursor:pointer}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn[data-armed="1"]{border-color:var(--danger);color:var(--danger)}
+.bar{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:12px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.bar .r{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bar label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--muted);font-weight:600}
+.bar .grow{flex:1;min-width:150px}
+.bar select,.bar input{height:40px;font-size:15px;color:var(--fg)}
+.status{font-size:12px;color:var(--muted);margin-inline-start:auto}
+.pills{display:flex;flex-wrap:wrap;gap:8px;list-style:none;margin:0 0 16px;padding:0}
+.pill{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--hair);border-radius:999px;padding:5px 14px 5px 8px;font-size:13px;color:var(--muted);box-shadow:var(--shadow)}
+[dir=rtl] .pill{padding:5px 8px 5px 14px}
+.pill b{font-family:var(--font-display);font-size:20px;line-height:1;color:var(--fg);font-variant-numeric:tabular-nums}
+.g{width:20px;height:20px;display:inline-grid;place-items:center;font-size:12px;font-weight:700;flex:none;background:var(--tc);color:var(--ti)}
+.seg button[aria-pressed="true"] .g{background:var(--ti);color:var(--tc)}
+.g.gs{border-radius:50%}.g.go{border-radius:5px;font-size:11px}.g.gp{clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0 50%)}.g.gf{clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+@media (max-width:820px){.grid{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0;box-shadow:var(--shadow)}
+.card-head{display:flex;align-items:center;gap:10px}
+.idx{flex:none;width:22px;font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--muted);text-align:center}
+input.num{width:70px;height:46px;text-align:center;font-family:var(--font-display);font-weight:700;font-size:28px;line-height:1;padding:0;border:2px solid var(--line-soft);border-radius:10px}
+input.pos{flex:1;height:46px;font-size:16px}
+.rm{flex:none;height:46px}
+.row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
+.seg{display:grid;grid-template-columns:repeat(4,auto);gap:6px}
+.seg button{display:flex;align-items:center;justify-content:center;gap:7px;border:1px solid var(--hair);border-radius:10px;background:var(--field);color:var(--fg);font:600 13.5px var(--font-body);min-height:40px;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--tc);border-color:var(--tc);color:var(--ti)}
+.spacer{flex:1}
+.lanes{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lanes>span{font-size:12.5px;font-weight:600;color:var(--muted);margin-inline-end:2px}
+.lanes button{width:42px;height:42px;border-radius:50%;border:2px solid var(--lc);background:transparent;color:var(--lc);font:700 18px var(--font-display);cursor:pointer;padding:0}
+.lanes button[aria-pressed="true"]{background:var(--lc);color:var(--dot-ink)}
+.resrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.resrow>span{font-size:12.5px;font-weight:600;color:var(--muted)}
+.resrow button{min-height:38px;padding:4px 18px;border-radius:999px;border:2px solid var(--rc);background:transparent;color:var(--rc);font:600 14px var(--font-body);cursor:pointer}
+.resrow button[aria-pressed="true"]{background:var(--rc);color:var(--dot-ink)}
+.x.flip{font-size:15px;padding:0 4px}
+.hintrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;min-height:36px;background:var(--field);border-radius:10px;padding:4px 12px}
+.dots{display:inline-flex;gap:5px;flex:none}
+.dots i{width:9px;height:9px;border-radius:50%;border:2px solid var(--line-soft)}
+.dots i.done{background:var(--fg);border-color:var(--fg)}
+.dots i.cur{border-color:var(--accent);background:var(--accent)}
+.hint{margin:0;font-size:13.5px;flex:1;min-width:0}
+.court{display:block;width:100%;height:auto;background:var(--court);border-radius:10px;overflow:hidden;touch-action:manipulation;cursor:crosshair;direction:ltr;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.court text{font-family:var(--font-body)}
+.court .dyn g{filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.35))}
+.ln{fill:none;stroke:var(--line);stroke-width:2}
+.ray{stroke:var(--line-soft);stroke-width:1.4;fill:none}
+.notes{display:flex;flex-direction:column;gap:8px}
+.notes-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;border-top:1px solid var(--hair);padding-top:10px}
+.notes-head b{font-family:var(--font-display);font-size:20px;line-height:1;font-weight:700}
+.sum{font-size:12.5px;color:var(--muted)}
+.log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.log li{display:flex;align-items:flex-start;gap:9px;font-size:13.5px;line-height:1.45;padding:6px 0;border-bottom:1px solid var(--hair)}
+.log li:last-child{border-bottom:0}
+.log .t{flex:1;min-width:0}
+.sw{flex:none;width:20px;height:20px;display:inline-grid;place-items:center;font-size:11px;font-weight:700;margin-top:1px}
+.sw.s{border-radius:50%;color:var(--dot-ink)}
+.sw.o{border-radius:50%;background:var(--card);border:2px solid;font-size:10px}.sw.p{background:var(--p);color:var(--p-ink);clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0 50%)}
+.sw.f{background:var(--f);color:var(--f-ink);clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.x{flex:none;border:0;background:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:0 6px}
+.empty{color:var(--muted);font-size:13px;border-bottom:0!important}
+textarea.note{width:100%;min-height:66px;resize:vertical}
+.addrow{display:flex;justify-content:center;margin-top:18px}
+/* summary */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.scard{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;box-shadow:var(--shadow)}
+.shead{display:flex;align-items:baseline;gap:10px}
+.shead b{font-family:var(--font-display);font-size:30px;line-height:1}
+.shead span{color:var(--muted);font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center}
+.stats div{background:var(--field);border-radius:9px;padding:6px 2px;font-size:11.5px;color:var(--muted);line-height:1.2}
+.stats b{display:block;font-family:var(--font-display);font-size:24px;color:var(--fg)}
+.cap{font-size:12px;font-weight:600;color:var(--muted);margin:0 0 5px}
+.ggrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;direction:ltr;border:3px solid var(--line);border-bottom:0;padding:4px;border-radius:6px 6px 0 0}
+.gc{position:relative;height:40px;display:grid;place-items:center;background:var(--field);border-radius:6px;overflow:hidden}
+.gc i{position:absolute;inset:0;background:var(--accent)}
+.gc b{position:relative;font-family:var(--font-display);font-size:20px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:flex;align-items:center;gap:6px;border:1.5px solid var(--lc,var(--hair));border-radius:999px;padding:2px 10px 2px 3px;font-size:13px;font-variant-numeric:tabular-nums}
+[dir=rtl] .chip{padding:2px 3px 2px 10px}
+.chip em{font-style:normal;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--lc,var(--muted));color:var(--dot-ink);font:700 12px var(--font-display)}
+.chip.plain{padding:2px 12px;border-color:var(--hair)}
+.chip.plain b{font-family:var(--font-display);font-size:16px;margin-inline-start:4px}
+@media (max-width:520px){h1{font-size:30px}.seg{grid-template-columns:repeat(2,minmax(0,1fr));width:100%}.seg button{padding:6px 4px;font-size:12.5px}}
+</style>
+</head>
+<body>
+<div class="wrap" id="wrap">
+  <header class="top">
+    <div>
+      <h1 data-i="title"></h1>
+      <p class="sub" data-i="sub"></p>
+    </div>
+    <button type="button" class="btn" id="lang"></button>
+  </header>
+
+  <section class="bar" aria-label="Match">
+    <div class="r">
+      <label class="grow"><span data-i="match"></span><select id="sel"></select></label>
+      <button type="button" class="btn pri" id="newm" data-i="newMatch" style="align-self:flex-end"></button>
+    </div>
+    <div class="r">
+      <label class="grow" style="flex:2"><span data-i="matchName"></span><input id="mname" type="text" data-ph="matchPh"></label>
+      <label class="grow"><span data-i="date"></span><input id="mdate" type="date"></label>
+    </div>
+    <div class="r">
+      <button type="button" class="btn" id="exp" data-i="backup"></button>
+      <button type="button" class="btn" id="imp" data-i="restore"></button>
+      <input type="file" id="file" accept="application/json,.json" hidden>
+      <button type="button" class="btn" id="clr" data-i="clearMatch"></button>
+      <button type="button" class="btn" id="delm" data-i="delMatch"></button>
+      <span class="status" id="status" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <ul class="pills">
+    <li class="pill"><span class="g gs" style="--tc:var(--accent);--ti:var(--accent-ink)"></span><b id="t-s">0</b><span data-i="shots"></span></li>
+    <li class="pill"><span class="g go" style="--tc:var(--danger);--ti:#fff">✕</span><b id="t-o">0</b><span data-i="outs"></span></li>
+    <li class="pill"><span class="g gp" style="--tc:var(--p);--ti:var(--p-ink)">P</span><b id="t-p">0</b><span data-i="pens"></span></li>
+    <li class="pill"><span class="g gf" style="--tc:var(--f);--ti:var(--f-ink)">F</span><b id="t-f">0</b><span data-i="fasts"></span></li>
+  </ul>
+
+  <main class="grid" id="grid"></main>
+  <div class="addrow"><button type="button" class="btn pri" id="addp" data-i="addPlayer"></button></div>
+
+  <h2 data-i="summary"></h2>
+  <div class="sgrid" id="sgrid"></div>
+
+  <datalist id="positions"></datalist>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var KEY = 'handball-shot-board-v2', OLD = 'handball-shot-board-v1';
+  var GY = 70, BY = 335, XL = 10, XR = 390, CX = 200, PXM = 19;
+  var GX = 98, GT = 4, GW = 204, GH = 66, MAXP = 30;
+  var XT = [98, 158, 200, 242, 302], XB = [10, 105, 200, 295, 390];
+  var LBL = [[34, 200], [67, 300], [156, 310], [244, 310], [333, 300], [366, 200]];
+  var ET = [XL].concat(XT, [XR]), EB = [XL].concat(XB, [XR]);
+  var TOOLS = { s: 1, p: 1, f: 1, o: 1 };
+
+  var I18N = {
+    ar: {
+      title: 'لوحة تسديدات كرة اليد',
+      sub: 'اختار الممر اللي دخل منه اللاعب (1 = أقصى الشمال)، بعدها دوس مكان التسديدة على الملعب، وبعدها دوس المربع اللي سدد عليه في الجون.',
+      match: 'الماتشات المحفوظة', matchName: 'اسم الماتش', matchPh: 'اكتب اسم الماتش', date: 'التاريخ', untitled: 'ماتش',
+      newMatch: '+ ماتش جديد', delMatch: 'مسح الماتش', clearMatch: 'مسح كل العلامات', sure: 'متأكد؟', sureAll: 'تمسح كل العلامات؟',
+      backup: 'نسخة احتياطية', restore: 'استرجاع نسخة', savedLocal: 'اتحفظ على الجهاز بس', cloudConn: 'جاري الاتصال بفايربيس…', cloudSaving: 'جاري الحفظ…', cloudSaved: 'اتحفظ على فايربيس ✓', cloudPending: 'محفوظ على الجهاز، هيترفع لما النت يرجع', cloudErr: 'مشكلة في الاتصال بفايربيس (راجع قواعد Firestore)', saved: 'اتحفظ ✓', saveFail: 'مش قادر يحفظ في المتصفح', imported: 'تم الاسترجاع', badFile: 'الملف مش صالح',
+      scored: 'جه ✓', missed: 'ماجاش ✗', res: 'النتيجة', flip: 'غيّر النتيجة', resNote: 'ضربات الجزاء والمرتدات: جه / الإجمالي', shots: 'تسديدات', outs: 'منها بره الجون', out: 'بره الجون', pens: 'ضربات جزاء', fasts: 'هجمات مرتدة', addPlayer: '+ إضافة لاعب', rm: 'حذف',
+      num: 'رقم', pos: 'المركز', shot: 'تسديدة', pen: 'ضربة جزاء', fast: 'هجمة مرتدة',
+      undo: 'تراجع', clear: 'مسح', lane: 'ممر الدخول', notes: 'ملاحظات', notePh: 'اكتب ملاحظاتك هنا', empty: 'العلامات اللي هتحطها هتتكتب هنا.',
+      hLane: 'اختار الممر اللي دخل منه (1 إلى 6).', hPos: 'دوس على مكان التسديدة في الملعب.', hGoal: 'دوس على المربع اللي سدد عليه في الجون.', hPen: 'ضربة جزاء: دوس على المربع في الجون.',
+      summary: 'ملخص اللاعبين', total: 'الإجمالي', goalSq: 'مربعات الجون', entry: 'ممر الدخول', dist: 'مسافة التسديد', noData: 'لسه مفيش تسديدات.', player: 'لاعب',
+      reg: ['جوه الـ 6م', 'بين 6م و9م', 'بره الـ 9م'],
+      goals: ['أعلى اليسار', 'أعلى المنتصف', 'أعلى اليمين', 'وسط اليسار', 'المنتصف', 'وسط اليمين', 'أسفل اليسار', 'أسفل المنتصف', 'أسفل اليمين'],
+      positions: ['جناح أيسر', 'ظهير أيسر', 'ظهير أوسط', 'ظهير أيمن', 'جناح أيمن', 'دائرة', 'حارس مرمى'],
+      m6: '6م', m9: '9م',
+      logS: function (a) { return a.lab + ' ' + a.n + ': دخل من الممر ' + (a.l + 1) + '، سدد من الممر ' + (a.z + 1) + '، ' + a.reg + '، على بعد ' + a.m + ' م تقريباً من الجون، نحو ' + a.goal; },
+      logO: function (a) { return a.lab + ' ' + a.n + ': دخل من الممر ' + (a.l + 1) + '، سدد من الممر ' + (a.z + 1) + '، ' + a.reg + '، على بعد ' + a.m + ' م تقريباً من الجون، والكورة طلعت بره'; },
+      logP: function (a) { return a.lab + ' ' + a.n + ': نحو ' + a.goal; },
+      sumLine: function (s, p, f, o) { return s + ' تسديدة' + (o ? ' (' + o + ' بره)' : '') + ' · ' + p + ' جزاء · ' + f + ' مرتدة'; }
+    },
+    en: {
+      title: 'Handball Shot Board',
+      sub: 'Pick the lane he entered from (1 = far left), then tap where he shot from, then tap the goal square he aimed at.',
+      match: 'Saved matches', matchName: 'Match name', matchPh: 'Type the match name', date: 'Date', untitled: 'Match',
+      newMatch: '+ New match', delMatch: 'Delete match', clearMatch: 'Clear all marks', sure: 'Sure?', sureAll: 'Clear all marks?',
+      backup: 'Backup', restore: 'Restore backup', savedLocal: 'Saved on this device only', cloudConn: 'Connecting to Firebase…', cloudSaving: 'Saving…', cloudSaved: 'Saved to Firebase ✓', cloudPending: 'Saved on device, will upload when back online', cloudErr: 'Firebase connection problem (check Firestore rules)', saved: 'Saved ✓', saveFail: 'Could not save in this browser', imported: 'Restored', badFile: 'Invalid file',
+      scored: 'Scored ✓', missed: 'Missed ✗', res: 'Result', flip: 'Toggle result', resNote: 'Penalties and fast breaks: scored / total', shots: 'Shots', outs: 'of them out', out: 'Out', pens: 'Penalties', fasts: 'Fast breaks', addPlayer: '+ Add player', rm: 'Remove',
+      num: 'No.', pos: 'Position', shot: 'Shot', pen: 'Penalty', fast: 'Fast break',
+      undo: 'Undo', clear: 'Clear', lane: 'Entry lane', notes: 'Notes', notePh: 'Write your notes here', empty: 'Marks you place are written up here.',
+      hLane: 'Pick the lane he entered from (1 to 6).', hPos: 'Tap where he shot from.', hGoal: 'Tap the goal square he aimed at.', hPen: 'Penalty: tap the goal square.',
+      summary: 'Player summary', total: 'Total', goalSq: 'Goal squares', entry: 'Entry lane', dist: 'Shooting distance', noData: 'No shots yet.', player: 'Player',
+      reg: ['inside the 6 m', 'between the 6 m and 9 m', 'outside the 9 m'],
+      goals: ['top left', 'top middle', 'top right', 'middle left', 'center', 'middle right', 'bottom left', 'bottom middle', 'bottom right'],
+      positions: ['Left wing', 'Left back', 'Center back', 'Right back', 'Right wing', 'Pivot', 'Goalkeeper'],
+      m6: '6 m', m9: '9 m',
+      logS: function (a) { return a.lab + ' ' + a.n + ': entered lane ' + (a.l + 1) + ', shot from lane ' + (a.z + 1) + ', ' + a.reg + ', about ' + a.m + ' m from goal, aimed at the ' + a.goal; },
+      logO: function (a) { return a.lab + ' ' + a.n + ': entered lane ' + (a.l + 1) + ', shot from lane ' + (a.z + 1) + ', ' + a.reg + ', about ' + a.m + ' m from goal, the ball went out'; },
+      logP: function (a) { return a.lab + ' ' + a.n + ': aimed at the ' + a.goal; },
+      sumLine: function (s, p, f, o) { return s + ' shots' + (o ? ' (' + o + ' out)' : '') + ' · ' + p + ' P · ' + f + ' F'; }
+    }
+  };
+
+  // ---------- data ----------
+  function blank() { return { num: '', pos: '', tool: 's', lane: null, res: 1, events: [], note: '' }; }
+  function today() { var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; }; return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); }
+  function uid() { return 'm' + Date.now().toString(36) + Math.floor(Math.random() * 1e4).toString(36); }
+  function newMatch() { var c = []; for (var i = 0; i < 6; i++) c.push(blank()); return { id: uid(), name: '', date: today(), updated: Date.now(), cells: c }; }
+  function zoneAt(x, y) {
+    var t = (y - GY) / (BY - GY), n = 0;
+    for (var k = 0; k < 5; k++) if (x > XT[k] + (XB[k] - XT[k]) * t) n++;
+    return n;
+  }
+  function r1(n) { return Math.round(n * 10) / 10; }
+  function cleanEv(e) {
+    if (!e || !TOOLS[e.k]) return null;
+    var g = (typeof e.g === 'number' && e.g >= 0 && e.g <= 8) ? (e.g | 0) : -1;
+    if (g < 0 && e.k !== 'o') return null;
+    if (e.k === 'p') return { k: 'p', g: g, r: e.r === 0 ? 0 : 1 };
+    if (typeof e.x !== 'number' || typeof e.y !== 'number') return null;
+    var l = (typeof e.l === 'number' && e.l >= 0 && e.l <= 5) ? (e.l | 0) : (typeof e.ex === 'number' ? zoneAt(e.ex, e.ey) : 0);
+    return e.k === 'o' ? { k: 'o', x: e.x, y: e.y, l: l } : { k: e.k, x: e.x, y: e.y, l: l, g: g, r: e.k === 'f' ? (e.r === 0 ? 0 : 1) : undefined };
+  }
+  function cleanCells(src) {
+    var out = [];
+    (Array.isArray(src) ? src : []).slice(0, MAXP).forEach(function (c) {
+      c = c || {};
+      var ev = [];
+      (Array.isArray(c.events) ? c.events : []).forEach(function (e) { var o = cleanEv(e); if (o) ev.push(o); });
+      out.push({
+        num: String(c.num || '').slice(0, 3), pos: String(c.pos || '').slice(0, 40),
+        tool: TOOLS[c.tool] ? c.tool : 's', lane: (typeof c.lane === 'number' && c.lane >= 0 && c.lane <= 5) ? c.lane : null, res: c.res === 0 ? 0 : 1,
+        events: ev, note: String(c.note || '').slice(0, 2000)
+      });
+    });
+    if (!out.length) out.push(blank());
+    return out;
+  }
+  function cleanMatches(arr, fresh) {
+    var out = [];
+    (Array.isArray(arr) ? arr : []).forEach(function (m) {
+      if (!m) return;
+      out.push({ id: fresh ? uid() : String(m.id || uid()), name: String(m.name || '').slice(0, 80), date: String(m.date || '').slice(0, 10), updated: +m.updated || 0, cells: cleanCells(m.cells) });
+    });
+    return out;
+  }
+  var store;
+  function load() {
+    try {
+      var r = localStorage.getItem(KEY);
+      if (r) {
+        var d = JSON.parse(r), ms = cleanMatches(d.matches);
+        if (!ms.length) ms = [newMatch()];
+        var cur = ms.some(function (m) { return m.id === d.cur; }) ? d.cur : ms[0].id;
+        store = { lang: d.lang === 'en' ? 'en' : 'ar', cur: cur, matches: ms };
+        return;
+      }
+    } catch (e) {}
+    var m = newMatch();
+    try {
+      var o = localStorage.getItem(OLD);
+      if (o) { var od = JSON.parse(o); m.cells = cleanCells(od.cells); m.updated = +od.updated || Date.now(); }
+    } catch (e) {}
+    store = { lang: 'ar', cur: m.id, matches: [m] };
+  }
+  load();
+  function cur() { for (var i = 0; i < store.matches.length; i++) if (store.matches[i].id === store.cur) return store.matches[i]; return store.matches[0]; }
+  function cells() { return cur().cells; }
+  function T(k) { return I18N[store.lang][k]; }
+
+  var colRef = null, pushTimers = {}, saveTimer = null, statusEl = document.getElementById('status');
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(store)); statusEl.textContent = colRef ? T('cloudSaving') : T('savedLocal'); }
+    catch (e) { statusEl.textContent = T('saveFail'); }
+  }
+  function touch() { cur().updated = Date.now(); save(); queuePush(store.cur); }
+
+  // ---------- helpers ----------
+  var grid = document.getElementById('grid'), cards = [], pend = [];
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function where(x, y) {
+    var dx = x - CX, dy = y - GY, d = Math.sqrt(dx * dx + dy * dy);
+    var ri = d <= 114 ? 0 : ((dx / 190) * (dx / 190) + (dy / 171) * (dy / 171) <= 1 ? 1 : 2);
+    return { z: zoneAt(x, y), ri: ri, reg: T('reg')[ri], m: (d / PXM).toFixed(1) };
+  }
+  function goalIndex(p) {
+    var col = Math.min(2, Math.max(0, Math.floor((p.x - GX) / (GW / 3))));
+    var row = Math.min(2, Math.max(0, Math.floor((p.y - GT) / (GH / 3))));
+    return row * 3 + col;
+  }
+  function inGoal(p) { return p.x >= GX && p.x <= GX + GW && p.y >= GT && p.y <= GY; }
+  function hexPts(cx, cy, r) {
+    return [[r, 0], [r / 2, -r * 0.866], [-r / 2, -r * 0.866], [-r, 0], [-r / 2, r * 0.866], [r / 2, r * 0.866]].map(function (q) { return r1(cx + q[0]) + ',' + r1(cy + q[1]); }).join(' ');
+  }
+  function laneStart(l, x, y) {
+    var dx = x - LBL[l][0], dy = y - LBL[l][1], len = Math.sqrt(dx * dx + dy * dy) || 1;
+    return [r1(LBL[l][0] + dx / len * 13), r1(LBL[l][1] + dy / len * 13)];
+  }
+
+  // ---------- court + card ----------
+  function staticLayer(i) {
+    var s = '<defs>';
+    for (var l = 0; l < 6; l++) s += '<marker id="mk' + i + '_' + l + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--l' + (l + 1) + ')"/></marker>';
+    s += '<marker id="mkf' + i + '" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" style="fill:var(--f)"/></marker>';
+    s += '<linearGradient id="fl' + i + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--court)"/><stop offset="1" style="stop-color:var(--court-2)"/></linearGradient>';
+    s += '<pattern id="net' + i + '" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V6" stroke-width="1" style="stroke:var(--line-soft)"/></pattern></defs>';
+    s += '<rect width="400" height="345" fill="url(#fl' + i + ')"/>';
+    for (var z = 0; z < 6; z++) s += '<polygon points="' + ET[z] + ',' + GY + ' ' + ET[z + 1] + ',' + GY + ' ' + EB[z + 1] + ',' + BY + ' ' + EB[z] + ',' + BY + '" style="fill:var(--l' + (z + 1) + ')" fill-opacity="0.13"/>';
+    s += '<path d="M86 70A114 114 0 0 0 314 70Z" style="fill:var(--area)" fill-opacity="0.85"/>';
+    s += '<rect x="98" y="4" width="204" height="66" fill="url(#net' + i + ')" fill-opacity="0.55"/>';
+    s += '<path class="ray" d="M166 4V70M234 4V70M98 26H302M98 48H302"/>';
+    s += '<path class="ln" stroke-width="3.2" stroke-linejoin="round" d="M98 70V4H302V70"/>';
+    s += '<path class="ln" stroke-width="2.4" d="M' + XL + ' ' + GY + 'H' + XR + 'M' + XL + ' ' + GY + 'V' + BY + 'M' + XR + ' ' + GY + 'V' + BY + '"/>';
+    for (var k = 0; k < 5; k++) s += '<line class="ray" x1="' + XT[k] + '" y1="' + GY + '" x2="' + XB[k] + '" y2="' + BY + '"/>';
+    s += '<path class="ln" stroke-width="3" d="M86 70A114 114 0 0 0 314 70"/>';
+    s += '<path class="ln" stroke-dasharray="9 7" d="M13 100A190 171 0 0 0 387 100"/>';
+    s += '<text x="207" y="198" font-size="10.5" font-weight="600" style="fill:var(--muted)">' + T('m6') + '</text>';
+    s += '<text x="207" y="256" font-size="10.5" font-weight="600" style="fill:var(--muted)">' + T('m9') + '</text>';
+    for (var n = 0; n < 6; n++) {
+      s += '<circle cx="' + LBL[n][0] + '" cy="' + LBL[n][1] + '" r="11" fill-opacity="0.22" style="fill:var(--l' + (n + 1) + ')"/>';
+      s += '<text x="' + LBL[n][0] + '" y="' + LBL[n][1] + '" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="700" style="fill:var(--l' + (n + 1) + ')">' + (n + 1) + '</text>';
+    }
+    return s;
+  }
+
+  function build(i) {
+    var a = document.createElement('article');
+    a.className = 'card';
+    a.setAttribute('data-i', i);
+    var lanes = '';
+    for (var l = 0; l < 6; l++) lanes += '<button type="button" data-act="lane" data-l="' + l + '" style="--lc:var(--l' + (l + 1) + ')" aria-pressed="false">' + (l + 1) + '</button>';
+    a.innerHTML =
+      '<div class="card-head">' +
+        '<span class="idx">' + (i + 1) + '</span>' +
+        '<input class="num" type="text" inputmode="numeric" maxlength="3" placeholder="' + T('num') + '" aria-label="' + T('num') + '">' +
+        '<input class="pos" type="text" list="positions" placeholder="' + T('pos') + '" aria-label="' + T('pos') + '">' +
+        '<button type="button" class="btn rm" data-act="rm">' + T('rm') + '</button>' +
+      '</div>' +
+      '<div class="row">' +
+        '<div class="seg" role="group">' +
+          '<button type="button" data-act="tool" data-t="s" style="--tc:var(--accent);--ti:var(--accent-ink)" aria-pressed="true"><span class="g gs"></span>' + T('shot') + '</button>' +
+          '<button type="button" data-act="tool" data-t="o" style="--tc:var(--danger);--ti:#fff" aria-pressed="false"><span class="g go">✕</span>' + T('out') + '</button>' +
+          '<button type="button" data-act="tool" data-t="p" style="--tc:var(--p);--ti:var(--p-ink)" aria-pressed="false"><span class="g gp">P</span>' + T('pen') + '</button>' +
+          '<button type="button" data-act="tool" data-t="f" style="--tc:var(--f);--ti:var(--f-ink)" aria-pressed="false"><span class="g gf">F</span>' + T('fast') + '</button>' +
+        '</div>' +
+        '<span class="spacer"></span>' +
+        '<button type="button" class="btn" data-act="undo">' + T('undo') + '</button>' +
+        '<button type="button" class="btn" data-act="clear">' + T('clear') + '</button>' +
+      '</div>' +
+      '<div class="lanes"><span>' + T('lane') + '</span>' + lanes + '</div>' +
+      '<div class="resrow"><span>' + T('res') + '</span><button type="button" data-act="res" data-r="1" style="--rc:var(--l3)" aria-pressed="true">' + T('scored') + '</button><button type="button" data-act="res" data-r="0" style="--rc:var(--danger)" aria-pressed="false">' + T('missed') + '</button></div>' +
+      '<div class="hintrow"><span class="dots" aria-hidden="true"></span><p class="hint" aria-live="polite"></p></div>' +
+      '<svg class="court" viewBox="0 0 400 345" role="img">' + staticLayer(i) + '<g class="dyn"></g></svg>' +
+      '<div class="notes">' +
+        '<div class="notes-head"><b>' + T('notes') + '</b><span class="sum"></span></div>' +
+        '<ul class="log"></ul>' +
+        '<textarea class="note" placeholder="' + T('notePh') + '"></textarea>' +
+      '</div>';
+    return a;
+  }
+
+  // ---------- render ----------
+  function render(i) {
+    var cs = cells(), c = cs[i], a = cards[i], pd = pend[i];
+    var multi = c.tool !== 'p';
+    Array.prototype.forEach.call(a.querySelectorAll('[data-act=tool]'), function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-t') === c.tool)); });
+    Array.prototype.forEach.call(a.querySelectorAll('[data-act=lane]'), function (b) { b.setAttribute('aria-pressed', String(+b.getAttribute('data-l') === c.lane)); });
+    a.querySelector('.lanes').hidden = !multi;
+    a.querySelector('.resrow').hidden = !(c.tool === 'p' || c.tool === 'f');
+    Array.prototype.forEach.call(a.querySelectorAll('[data-act=res]'), function (b) { b.setAttribute('aria-pressed', String(+b.getAttribute('data-r') === c.res)); });
+    a.querySelector('.rm').hidden = cs.length < 2;
+    var stage = multi ? (c.lane === null ? 0 : (pd ? 2 : 1)) : 0;
+    a.querySelector('.hint').textContent = multi ? [T('hLane'), T('hPos'), T('hGoal')][stage] : T('hPen');
+    var nd = c.tool === 'o' ? 2 : 3;
+    var dots = '';
+    if (multi) for (var d = 0; d < nd; d++) dots += '<i class="' + (d < stage ? 'done' : (d === stage ? 'cur' : '')) + '"></i>';
+    a.querySelector('.dots').innerHTML = dots;
+
+    var arrows = '', marks = '', items = '', ns = 0, np = 0, nf = 0, no = 0, sp = 0, sf = 0, goalHits = [], GN = T('goals'), pos = [];
+    c.events.forEach(function (e, idx) {
+      if (e.x === undefined) { pos[idx] = null; return; }
+      var k = 0;
+      for (var j = 0; j < idx; j++) { var o = c.events[j]; if (o.x !== undefined && Math.abs(o.x - e.x) < 13 && Math.abs(o.y - e.y) < 13) k++; }
+      var px = e.x, py = e.y;
+      if (k) { var an = k * 2.4, rd = 10 + 3 * k; px = r1(Math.min(XR - 12, Math.max(XL + 12, e.x + Math.cos(an) * rd))); py = r1(Math.min(BY - 12, Math.max(GY + 12, e.y + Math.sin(an) * rd))); }
+      pos[idx] = [px, py];
+    });
+    c.events.forEach(function (e, idx) {
+      var txt, sw, L = I18N[store.lang];
+      if (e.k === 'p') {
+        np++;
+        var okP = e.r !== 0; if (okP) sp++;
+        goalHits.push({ kind: 'p', lab: 'P', g: e.g, ok: okP });
+        txt = L.logP({ lab: T('pen'), n: np, goal: GN[e.g] }) + ' — ' + T(okP ? 'scored' : 'missed');
+        sw = '<span class="sw p">P</span>';
+      } else {
+        var w = where(e.x, e.y), isF = e.k === 'f', isO = e.k === 'o', n = isF ? ++nf : ++ns;
+        if (isO) no++;
+        var col = isF ? 'var(--f)' : 'var(--l' + (e.l + 1) + ')';
+        var X = pos[idx][0], Y = pos[idx][1];
+        var st = laneStart(e.l, X, Y), dx = X - st[0], dy = Y - st[1], len = Math.sqrt(dx * dx + dy * dy) || 1;
+        var mk = isF ? 'mkf' + i : 'mk' + i + '_' + e.l;
+        arrows += '<line x1="' + st[0] + '" y1="' + st[1] + '" x2="' + r1(X - dx / len * 14) + '" y2="' + r1(Y - dy / len * 14) + '" stroke-width="2.4" stroke-opacity="0.9"' + (isO ? ' stroke-dasharray="5 4"' : '') + ' style="stroke:' + col + '" marker-end="url(#' + mk + ')"/>';
+        if (isF) {
+          var okF = e.r !== 0; if (okF) sf++;
+          marks += '<g><polygon points="' + X + ',' + (Y - 14) + ' ' + (X + 14) + ',' + Y + ' ' + X + ',' + (Y + 14) + ' ' + (X - 14) + ',' + Y + '" stroke-width="' + (okF ? 2 : 3) + '" style="fill:' + (okF ? 'var(--f)' : 'var(--card)') + ';stroke:' + (okF ? 'var(--card)' : 'var(--f)') + '"/><text x="' + X + '" y="' + Y + '" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" style="fill:' + (okF ? 'var(--f-ink)' : 'var(--f)') + '">F</text></g>';
+          sw = '<span class="sw f">F</span>';
+          txt = L.logS({ lab: T('fast'), n: n, l: e.l, z: w.z, reg: w.reg, m: w.m, goal: GN[e.g] }) + ' — ' + T(okF ? 'scored' : 'missed');
+          goalHits.push({ kind: 'f', lab: 'F', l: e.l, g: e.g, x: X, y: Y, ok: okF });
+        } else if (isO) {
+          marks += '<g><circle cx="' + X + '" cy="' + Y + '" r="11" stroke-width="3" style="fill:var(--card);stroke:' + col + '"/><text x="' + X + '" y="' + Y + '" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" style="fill:' + col + '">' + n + '</text><circle cx="' + (X + 9) + '" cy="' + (Y - 9) + '" r="5.5" style="fill:var(--danger)"/><text x="' + (X + 9) + '" y="' + (Y - 8.5) + '" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700" style="fill:#fff">×</text></g>';
+          sw = '<span class="sw o" style="border-color:' + col + ';color:' + col + '">' + n + '</span>';
+          txt = L.logO({ lab: T('shot'), n: n, l: e.l, z: w.z, reg: w.reg, m: w.m });
+        } else {
+          marks += '<g><circle cx="' + X + '" cy="' + Y + '" r="11" stroke-width="2" style="fill:' + col + ';stroke:var(--card)"/><text x="' + X + '" y="' + Y + '" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" style="fill:var(--dot-ink)">' + n + '</text></g>';
+          sw = '<span class="sw s" style="background:' + col + '">' + n + '</span>';
+          txt = L.logS({ lab: T('shot'), n: n, l: e.l, z: w.z, reg: w.reg, m: w.m, goal: GN[e.g] });
+          goalHits.push({ kind: 's', lab: String(n), l: e.l, g: e.g, x: X, y: Y });
+        }
+      }
+      items += '<li>' + sw + '<span class="t">' + esc(txt) + '</span>' + (e.k === 'p' || e.k === 'f' ? '<button type="button" class="x flip" data-act="flip" data-e="' + idx + '" title="' + T('flip') + '" aria-label="' + T('flip') + '">⇄</button>' : '') + '<button type="button" class="x" data-act="del" data-e="' + idx + '" aria-label="x">×</button></li>';
+    });
+
+    var gCells = '', gLines = '', gDots = '', seen = {}, cnt = {};
+    goalHits.forEach(function (h) { cnt[h.g] = (cnt[h.g] || 0) + 1; });
+    goalHits.forEach(function (h) {
+      var col = h.g % 3, row = Math.floor(h.g / 3), k = seen[h.g] || 0, tot = cnt[h.g];
+      seen[h.g] = k + 1;
+      var step = Math.min(21, (GW / 3 - 12) / Math.max(tot - 1, 1));
+      var r = tot <= 3 ? 9 : (tot <= 5 ? 7.5 : 6), fs = r >= 9 ? 11 : (r >= 7 ? 9.5 : 8);
+      var cx = r1(GX + (col + 0.5) * GW / 3 + (k - (tot - 1) / 2) * step), cy = r1(GT + (row + 0.5) * GH / 3);
+      var tv = h.kind === 's' ? 'var(--l' + (h.l + 1) + ')' : (h.kind === 'f' ? 'var(--f)' : 'var(--p)');
+      var ink = h.kind === 's' ? 'var(--dot-ink)' : (h.kind === 'f' ? 'var(--f-ink)' : 'var(--p-ink)');
+      if (k === 0) gCells += '<rect x="' + (GX + col * GW / 3) + '" y="' + (GT + row * GH / 3) + '" width="' + (GW / 3) + '" height="' + (GH / 3) + '" fill-opacity="0.3" style="fill:' + tv + '"/>';
+      if (h.x !== undefined) gLines += '<line x1="' + h.x + '" y1="' + h.y + '" x2="' + cx + '" y2="' + cy + '" stroke-width="1.4" stroke-dasharray="4 4" stroke-opacity="0.6" style="stroke:' + tv + '"/>';
+      var miss = h.ok === false;
+      if (miss) ink = tv;
+      var sf2 = miss ? 'var(--card)' : tv, ss = miss ? tv : 'var(--card)', sw2 = miss ? 2.2 : 1.5;
+      var shape = h.kind === 's' ? '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" stroke-width="' + sw2 + '" style="fill:' + sf2 + ';stroke:' + ss + '"/>'
+        : (h.kind === 'f' ? '<polygon points="' + cx + ',' + r1(cy - r - 2) + ' ' + r1(cx + r + 2) + ',' + cy + ' ' + cx + ',' + r1(cy + r + 2) + ' ' + r1(cx - r - 2) + ',' + cy + '" stroke-width="' + sw2 + '" style="fill:' + sf2 + ';stroke:' + ss + '"/>'
+        : '<polygon points="' + hexPts(cx, cy, r + 1) + '" stroke-width="' + sw2 + '" style="fill:' + sf2 + ';stroke:' + ss + '"/>');
+      gDots += '<g>' + shape + '<text x="' + cx + '" y="' + cy + '" text-anchor="middle" dominant-baseline="central" font-size="' + fs + '" font-weight="700" style="fill:' + ink + '">' + h.lab + '</text></g>';
+    });
+
+    var pendMark = '';
+    var goalBox = '<rect x="' + GX + '" y="' + GT + '" width="' + GW + '" height="' + GH + '" fill="none" stroke-width="2.6" stroke-dasharray="6 4" style="stroke:';
+    if (multi && pd && c.lane !== null) {
+      var pv = c.tool === 's' ? 'var(--l' + (c.lane + 1) + ')' : 'var(--f)';
+      var ps = laneStart(c.lane, pd.sx, pd.sy), qx = pd.sx - ps[0], qy = pd.sy - ps[1], ql = Math.sqrt(qx * qx + qy * qy) || 1;
+      pendMark = '<line x1="' + ps[0] + '" y1="' + ps[1] + '" x2="' + r1(pd.sx - qx / ql * 12) + '" y2="' + r1(pd.sy - qy / ql * 12) + '" stroke-width="2.4" stroke-dasharray="5 4" style="stroke:' + pv + '"/>' +
+        '<circle cx="' + pd.sx + '" cy="' + pd.sy + '" r="10" stroke-width="2.4" stroke-dasharray="3 3" style="fill:var(--court);stroke:' + pv + '"/>' + goalBox + pv + '"/>';
+    } else if (c.tool === 'p') pendMark = goalBox + 'var(--p)"/>';
+
+    a.querySelector('.dyn').innerHTML = gCells + gLines + arrows + marks + gDots + pendMark;
+    a.querySelector('.log').innerHTML = items || '<li class="empty">' + T('empty') + '</li>';
+    a.querySelector('.sum').textContent = c.events.length ? I18N[store.lang].sumLine(ns, sp + '/' + np, sf + '/' + nf, no) : '';
+    totals(); renderSummary();
+  }
+
+  function totals() {
+    var t = { s: 0, p: 0, f: 0, o: 0 }, ok = { p: 0, f: 0 };
+    cells().forEach(function (c) { c.events.forEach(function (e) { t[e.k]++; if ((e.k === 'p' || e.k === 'f') && e.r !== 0) ok[e.k]++; }); });
+    document.getElementById('t-s').textContent = t.s + t.o;
+    document.getElementById('t-o').textContent = t.o;
+    document.getElementById('t-p').textContent = ok.p + '/' + t.p;
+    document.getElementById('t-f').textContent = ok.f + '/' + t.f;
+  }
+
+  function renderSummary() {
+    var h = '';
+    cells().forEach(function (c, i) {
+      var g = [0, 0, 0, 0, 0, 0, 0, 0, 0], ln = [0, 0, 0, 0, 0, 0], rg = [0, 0, 0], ns = 0, np = 0, nf = 0, no = 0, sp = 0, sf = 0;
+      c.events.forEach(function (e) {
+        if (e.k !== 'o') g[e.g]++;
+        if (e.k === 'p') { np++; if (e.r !== 0) sp++; return; }
+        if (e.k === 's') ns++; else if (e.k === 'o') no++; else { nf++; if (e.r !== 0) sf++; }
+        ln[e.l]++; rg[where(e.x, e.y).ri]++;
+      });
+      var tot = ns + no + np + nf, mx = Math.max.apply(null, g) || 1;
+      h += '<article class="scard"><div class="shead"><b>' + (c.num ? '#' + esc(c.num) : (i + 1)) + '</b><span>' + esc(c.pos || (T('player') + ' ' + (i + 1))) + '</span></div>';
+      if (!tot) { h += '<p class="sum" style="margin:0">' + T('noData') + '</p></article>'; return; }
+      h += '<div class="stats"><div><b>' + tot + '</b>' + T('total') + '</div><div><b>' + ns + '</b>' + T('shot') + '</div><div><b>' + no + '</b>' + T('out') + '</div><div><b>' + sp + '/' + np + '</b>' + T('pens') + '</div><div><b>' + sf + '/' + nf + '</b>' + T('fasts') + '</div></div>' + (np || nf ? '<p class="cap" style="margin:-6px 0 0">' + T('resNote') + '</p>' : '');
+      h += '<div><p class="cap">' + T('goalSq') + '</p><div class="ggrid">';
+      g.forEach(function (n) { var o = n / mx; h += '<div class="gc"><i style="opacity:' + (n ? (0.18 + 0.82 * o).toFixed(2) : 0) + '"></i><b style="color:' + (o > 0.5 ? 'var(--accent-ink)' : 'var(--fg)') + '">' + n + '</b></div>'; });
+      h += '</div></div><div><p class="cap">' + T('entry') + '</p><div class="chips">';
+      ln.forEach(function (n, l) { h += '<span class="chip" style="--lc:var(--l' + (l + 1) + ')"><em>' + (l + 1) + '</em>' + n + '</span>'; });
+      h += '</div></div><div><p class="cap">' + T('dist') + '</p><div class="chips">';
+      rg.forEach(function (n, r) { h += '<span class="chip plain">' + T('reg')[r] + '<b>' + n + '</b></span>'; });
+      h += '</div></div></article>';
+    });
+    document.getElementById('sgrid').innerHTML = h;
+  }
+
+  function fillInputs() {
+    cards.forEach(function (a, i) {
+      var c = cells()[i];
+      a.querySelector('.num').value = c.num; a.querySelector('.pos').value = c.pos; a.querySelector('.note').value = c.note;
+    });
+  }
+  function renderAll() { for (var i = 0; i < cards.length; i++) render(i); if (!cards.length) { totals(); renderSummary(); } }
+  function buildAll() {
+    grid.innerHTML = ''; cards = []; pend = [];
+    cells().forEach(function (c, i) { var el = build(i); cards.push(el); pend.push(null); grid.appendChild(el); });
+    fillInputs(); renderAll();
+  }
+
+  // ---------- match bar + language ----------
+  function optLabel(m, i) { return (m.name || (T('untitled') + ' ' + (i + 1))) + (m.date ? ' · ' + m.date : ''); }
+  function renderBar() {
+    var sel = document.getElementById('sel');
+    sel.innerHTML = store.matches.map(function (m, i) { return '<option value="' + esc(m.id) + '"' + (m.id === store.cur ? ' selected' : '') + '>' + esc(optLabel(m, i)) + '</option>'; }).join('');
+    document.getElementById('mname').value = cur().name;
+    document.getElementById('mdate').value = cur().date;
+  }
+  function applyLang() {
+    var L = store.lang, root = document.documentElement;
+    root.lang = L; root.dir = L === 'ar' ? 'rtl' : 'ltr';
+    document.getElementById('wrap').dir = root.dir;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-i]'), function (el) { el.textContent = T(el.getAttribute('data-i')); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ph]'), function (el) { el.placeholder = T(el.getAttribute('data-ph')); });
+    document.getElementById('lang').textContent = L === 'ar' ? 'English' : 'عربي';
+    document.getElementById('positions').innerHTML = T('positions').map(function (p) { return '<option value="' + esc(p) + '"></option>'; }).join('');
+    renderBar(); buildAll();
+  }
+
+  // ---------- interaction ----------
+  function arm(btn, label, done) {
+    if (btn.getAttribute('data-armed') === '1') { btn.removeAttribute('data-armed'); btn.textContent = btn.getAttribute('data-label'); clearTimeout(btn._t); done(); return; }
+    btn.setAttribute('data-label', btn.textContent); btn.setAttribute('data-armed', '1'); btn.textContent = label;
+    btn._t = setTimeout(function () { btn.removeAttribute('data-armed'); btn.textContent = btn.getAttribute('data-label'); }, 3000);
+  }
+
+  grid.addEventListener('click', function (ev) {
+    var card = ev.target.closest('.card');
+    if (!card) return;
+    var i = +card.getAttribute('data-i'), cs = cells(), c = cs[i];
+    var act = ev.target.closest('[data-act]');
+    if (act) {
+      var what = act.getAttribute('data-act');
+      if (what === 'tool') { c.tool = act.getAttribute('data-t'); pend[i] = null; touch(); render(i); }
+      else if (what === 'res') { c.res = +act.getAttribute('data-r'); touch(); render(i); }
+      else if (what === 'flip') { var fe = c.events[+act.getAttribute('data-e')]; if (fe) { fe.r = fe.r === 0 ? 1 : 0; touch(); render(i); } }
+      else if (what === 'lane') { c.lane = +act.getAttribute('data-l'); touch(); render(i); }
+      else if (what === 'undo') {
+        if (pend[i]) { pend[i] = null; render(i); }
+        else if (c.events.length) { c.events.pop(); touch(); render(i); }
+      }
+      else if (what === 'del') { c.events.splice(+act.getAttribute('data-e'), 1); touch(); render(i); }
+      else if (what === 'clear') {
+        if (!c.events.length && !c.note && !c.num && !c.pos) return;
+        arm(act, T('sure'), function () { cs[i] = blank(); pend[i] = null; touch(); fillInputs(); render(i); });
+      }
+      else if (what === 'rm') {
+        if (cs.length < 2) return;
+        arm(act, T('sure'), function () { cs.splice(i, 1); touch(); buildAll(); });
+      }
+      return;
+    }
+    var svg = ev.target.closest('svg.court');
+    if (!svg) return;
+    var pt = svg.createSVGPoint();
+    pt.x = ev.clientX; pt.y = ev.clientY;
+    var p = pt.matrixTransform(svg.getScreenCTM().inverse());
+    var multi = c.tool !== 'p';
+    if (multi) { // tapping a lane number on the court also picks that lane
+      for (var l = 0; l < 6; l++) {
+        var ddx = p.x - LBL[l][0], ddy = p.y - LBL[l][1];
+        if (ddx * ddx + ddy * ddy <= 15 * 15) { c.lane = l; touch(); render(i); return; }
+      }
+    }
+    if (inGoal(p)) {
+      var g = goalIndex(p);
+      if (c.tool === 'p') { c.events.push({ k: 'p', g: g, r: c.res }); touch(); render(i); }
+      else if (pend[i] && c.lane !== null) {
+        c.events.push({ k: c.tool, x: pend[i].sx, y: pend[i].sy, l: c.lane, g: g, r: c.tool === 'f' ? c.res : undefined });
+        pend[i] = null; touch(); render(i);
+      }
+      return;
+    }
+    if (!multi || c.lane === null) { if (multi) render(i); return; }
+    if (p.x < XL || p.x > XR || p.y < GY || p.y > BY) return;
+    if (c.tool === 'o') { c.events.push({ k: 'o', x: r1(p.x), y: r1(p.y), l: c.lane }); touch(); render(i); return; }
+    pend[i] = { sx: r1(p.x), sy: r1(p.y) };
+    render(i);
+  });
+
+  grid.addEventListener('input', function (ev) {
+    var t = ev.target, card = t.closest('.card');
+    if (!card) return;
+    var idx = +card.getAttribute('data-i'), c = cells()[idx];
+    if (t.classList.contains('num')) { t.value = t.value.replace(/[^0-9]/g, '').slice(0, 3); c.num = t.value; }
+    else if (t.classList.contains('pos')) c.pos = t.value;
+    else if (t.classList.contains('note')) c.note = t.value;
+    else return;
+    touch(); renderSummary();
+  });
+
+  document.getElementById('addp').addEventListener('click', function () {
+    var cs = cells();
+    if (cs.length >= MAXP) return;
+    cs.push(blank()); touch();
+    var i = cs.length - 1, el = build(i); cards.push(el); pend.push(null); grid.appendChild(el);
+    fillInputs(); renderAll();
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  document.getElementById('sel').addEventListener('change', function (e) { store.cur = e.target.value; save(); renderBar(); buildAll(); });
+  document.getElementById('newm').addEventListener('click', function () {
+    var m = newMatch(); store.matches.push(m); store.cur = m.id; save(); renderBar(); buildAll();
+    document.getElementById('mname').focus();
+  });
+  document.getElementById('mname').addEventListener('input', function (e) {
+    cur().name = e.target.value; touch();
+    var o = document.getElementById('sel').selectedOptions[0]; if (o) o.textContent = optLabel(cur(), store.matches.indexOf(cur()));
+  });
+  document.getElementById('mdate').addEventListener('input', function (e) {
+    cur().date = e.target.value; touch();
+    var o = document.getElementById('sel').selectedOptions[0]; if (o) o.textContent = optLabel(cur(), store.matches.indexOf(cur()));
+  });
+  document.getElementById('clr').addEventListener('click', function (ev) {
+    arm(ev.currentTarget, T('sureAll'), function () {
+      var cs = cells(); for (var k = 0; k < cs.length; k++) cs[k] = blank();
+      touch(); buildAll();
+    });
+  });
+  document.getElementById('delm').addEventListener('click', function (ev) {
+    arm(ev.currentTarget, T('sure'), function () {
+      var i = store.matches.indexOf(cur()), delId = cur().id;
+      store.matches.splice(i, 1);
+      if (colRef) colRef.doc(delId).delete().catch(function () {});
+      if (!store.matches.length) store.matches.push(newMatch());
+      store.cur = store.matches[Math.min(i, store.matches.length - 1)].id;
+      save(); renderBar(); buildAll();
+    });
+  });
+  document.getElementById('lang').addEventListener('click', function () { store.lang = store.lang === 'ar' ? 'en' : 'ar'; save(); applyLang(); });
+
+  document.getElementById('exp').addEventListener('click', function () {
+    var blob = new Blob([JSON.stringify(store)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'handball-board-backup-' + today() + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+  });
+  document.getElementById('imp').addEventListener('click', function () { document.getElementById('file').click(); });
+  document.getElementById('file').addEventListener('change', function (e) {
+    var f = e.target.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      try {
+        var d = JSON.parse(rd.result), ms = cleanMatches(d.matches, true);
+        if (!ms.length) throw 0;
+        ms.forEach(function (m) { store.matches.push(m); queuePush(m.id); });
+        store.cur = ms[0].id; save(); renderBar(); buildAll(); statusEl.textContent = T('imported');
+      } catch (err) { statusEl.textContent = T('badFile'); }
+    };
+    rd.readAsText(f); e.target.value = '';
+  });
+
+  // ---------- cloud sync (Firebase Firestore) ----------
+  var FB_CONFIG = {
+    apiKey: "AIzaSyB5xHtOySVF96ouNyvvvlZ6lO9fCj5zdjo",
+    authDomain: "medhat-4430c.firebaseapp.com",
+    projectId: "medhat-4430c",
+    storageBucket: "medhat-4430c.firebasestorage.app",
+    messagingSenderId: "1055866702851",
+    appId: "1:1055866702851:web:ebc79bff69b8b5e5ea5236",
+    measurementId: "G-DLD6FLLHSB"
+  };
+  function findM(id) { for (var i = 0; i < store.matches.length; i++) if (store.matches[i].id === id) return store.matches[i]; return null; }
+  function isBlank(m) { return !m.name && m.cells.every(function (c) { return !c.num && !c.pos && !c.note && !c.events.length; }); }
+  function setCloud(k) { statusEl.textContent = T(k); }
+  function queuePush(id) {
+    if (!colRef) return;
+    clearTimeout(pushTimers[id]);
+    pushTimers[id] = setTimeout(function () {
+      var m = findM(id); if (!m) return;
+      var slow = setTimeout(function () { setCloud('cloudPending'); }, 6000);
+      colRef.doc(id).set({ name: m.name, date: m.date, updated: m.updated, data: JSON.stringify(m.cells) }).then(
+        function () { clearTimeout(slow); setCloud('cloudSaved'); },
+        function (e) { clearTimeout(slow); console.error(e); setCloud('cloudErr'); });
+    }, 700);
+  }
+  function applyRemote(id, d) {
+    var cs; try { cs = cleanCells(JSON.parse(d.data)); } catch (e) { return false; }
+    var up = +d.updated || 0, m = findM(id);
+    if (!m) { store.matches.push({ id: id, name: String(d.name || ''), date: String(d.date || ''), updated: up, cells: cs }); return 'other'; }
+    if (up > m.updated) { m.name = String(d.name || ''); m.date = String(d.date || ''); m.updated = up; m.cells = cs; return m.id === store.cur ? 'cur' : 'other'; }
+    return false;
+  }
+  function deferRebuild() {
+    var ae = document.activeElement;
+    if (ae && grid.contains(ae) && /INPUT|TEXTAREA/.test(ae.tagName)) { setTimeout(deferRebuild, 1500); return; }
+    buildAll();
+  }
+  function initCloud() {
+    if (!window.firebase || !firebase.firestore) return;
+    var first = true;
+    try {
+      firebase.initializeApp(FB_CONFIG);
+      var db = firebase.firestore();
+      try { db.enablePersistence({ synchronizeTabs: true }).catch(function () {}); } catch (e) {}
+      colRef = db.collection('handball_matches');
+      setCloud('cloudConn');
+      colRef.onSnapshot(function (snap) {
+        var needCur = false, needBar = false, ids = {};
+        snap.docChanges().forEach(function (ch) {
+          var id = ch.doc.id; ids[id] = 1;
+          if (ch.doc.metadata.hasPendingWrites) return;
+          if (ch.type === 'removed') {
+            var i = store.matches.indexOf(findM(id));
+            if (i >= 0 && store.matches.length > 1) { store.matches.splice(i, 1); if (store.cur === id) { store.cur = store.matches[0].id; needCur = true; } needBar = true; }
+            return;
+          }
+          var d = ch.doc.data(), r = applyRemote(id, d);
+          if (r) { needBar = true; if (r === 'cur') needCur = true; }
+          else if (first) { var lm = findM(id); if (lm && lm.updated > (+d.updated || 0)) queuePush(id); }
+        });
+        if (first) {
+          first = false;
+          if (snap.size) {
+            var before = store.cur;
+            store.matches = store.matches.filter(function (m) { return ids[m.id] || !isBlank(m); });
+            if (!findM(before)) {
+              store.matches.sort(function (a, b) { return b.updated - a.updated; });
+              store.cur = store.matches[0].id; needCur = true;
+            }
+            needBar = true;
+          }
+          store.matches.forEach(function (m) { if (!ids[m.id] && !isBlank(m)) queuePush(m.id); });
+        }
+        if (!store.matches.length) { var nm = newMatch(); store.matches.push(nm); store.cur = nm.id; needCur = true; needBar = true; }
+        save();
+        if (needBar) renderBar();
+        if (needCur) deferRebuild();
+        if (!snap.metadata.hasPendingWrites) setCloud('cloudSaved');
+      }, function (e) { console.error(e); setCloud('cloudErr'); });
+    } catch (e) { console.error(e); colRef = null; }
+  }
+
+  applyLang();
+  initCloud();
+})();
+</script>
+</body>
+</html>
