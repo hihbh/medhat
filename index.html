@@ -196,14 +196,14 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
       scored: 'جه ✓', missed: 'ماجاش ✗', res: 'النتيجة', flip: 'غيّر النتيجة', resNote: 'ضربات الجزاء والمرتدات: جه / الإجمالي', shots: 'تسديدات', outs: 'منها بره الجون', out: 'بره الجون', pens: 'ضربات جزاء', fasts: 'هجمات مرتدة', addPlayer: '+ إضافة لاعب', rm: 'حذف',
       num: 'رقم', pos: 'المركز', shot: 'تسديدة', pen: 'ضربة جزاء', fast: 'هجمة مرتدة',
       undo: 'تراجع', clear: 'مسح', lane: 'ممر الدخول', notes: 'ملاحظات', notePh: 'اكتب ملاحظاتك هنا', empty: 'العلامات اللي هتحطها هتتكتب هنا.',
-      hLane: 'اختار الممر اللي دخل منه (1 إلى 6).', hPos: 'دوس على مكان التسديدة في الملعب.', hGoal: 'دوس على المربع اللي سدد عليه في الجون.', hPen: 'ضربة جزاء: دوس على المربع في الجون.',
+      hLane: 'اختار الممر اللي دخل منه (1 إلى 6).', hPos: 'دوس على مكان التسديدة في الملعب.', hGoal: 'دوس على المربع اللي سدد عليه في الجون.', hGoalOut: 'دوس على المربع اللي ضيّع عليه في الجون.', hPen: 'ضربة جزاء: دوس على المربع في الجون.',
       summary: 'ملخص اللاعبين', total: 'الإجمالي', goalSq: 'مربعات الجون', entry: 'ممر الدخول', dist: 'مسافة التسديد', noData: 'لسه مفيش تسديدات.', player: 'لاعب',
       reg: ['جوه الـ 6م', 'بين 6م و9م', 'بره الـ 9م'],
       goals: ['أعلى اليسار', 'أعلى المنتصف', 'أعلى اليمين', 'وسط اليسار', 'المنتصف', 'وسط اليمين', 'أسفل اليسار', 'أسفل المنتصف', 'أسفل اليمين'],
       positions: ['جناح أيسر', 'ظهير أيسر', 'ظهير أوسط', 'ظهير أيمن', 'جناح أيمن', 'دائرة', 'حارس مرمى'],
       m6: '6م', m9: '9م',
       logS: function (a) { return a.lab + ' ' + a.n + ': دخل من الممر ' + (a.l + 1) + '، سدد من الممر ' + (a.z + 1) + '، ' + a.reg + '، على بعد ' + a.m + ' م تقريباً من الجون، نحو ' + a.goal; },
-      logO: function (a) { return a.lab + ' ' + a.n + ': دخل من الممر ' + (a.l + 1) + '، سدد من الممر ' + (a.z + 1) + '، ' + a.reg + '، على بعد ' + a.m + ' م تقريباً من الجون، والكورة طلعت بره'; },
+      logO: function (a) { return a.lab + ' ' + a.n + ': دخل من الممر ' + (a.l + 1) + '، سدد من الممر ' + (a.z + 1) + '، ' + a.reg + '، على بعد ' + a.m + ' م تقريباً من الجون، والكورة طلعت بره' + (a.goal ? ' (كان قاصد ' + a.goal + ')' : ''); },
       logP: function (a) { return a.lab + ' ' + a.n + ': نحو ' + a.goal; },
       sumLine: function (s, p, f, o) { return s + ' تسديدة' + (o ? ' (' + o + ' بره)' : '') + ' · ' + p + ' جزاء · ' + f + ' مرتدة'; }
     },
@@ -216,14 +216,14 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
       scored: 'Scored ✓', missed: 'Missed ✗', res: 'Result', flip: 'Toggle result', resNote: 'Penalties and fast breaks: scored / total', shots: 'Shots', outs: 'of them out', out: 'Out', pens: 'Penalties', fasts: 'Fast breaks', addPlayer: '+ Add player', rm: 'Remove',
       num: 'No.', pos: 'Position', shot: 'Shot', pen: 'Penalty', fast: 'Fast break',
       undo: 'Undo', clear: 'Clear', lane: 'Entry lane', notes: 'Notes', notePh: 'Write your notes here', empty: 'Marks you place are written up here.',
-      hLane: 'Pick the lane he entered from (1 to 6).', hPos: 'Tap where he shot from.', hGoal: 'Tap the goal square he aimed at.', hPen: 'Penalty: tap the goal square.',
+      hLane: 'Pick the lane he entered from (1 to 6).', hPos: 'Tap where he shot from.', hGoal: 'Tap the goal square he aimed at.', hGoalOut: 'Tap the goal square he missed at.', hPen: 'Penalty: tap the goal square.',
       summary: 'Player summary', total: 'Total', goalSq: 'Goal squares', entry: 'Entry lane', dist: 'Shooting distance', noData: 'No shots yet.', player: 'Player',
       reg: ['inside the 6 m', 'between the 6 m and 9 m', 'outside the 9 m'],
       goals: ['top left', 'top middle', 'top right', 'middle left', 'center', 'middle right', 'bottom left', 'bottom middle', 'bottom right'],
       positions: ['Left wing', 'Left back', 'Center back', 'Right back', 'Right wing', 'Pivot', 'Goalkeeper'],
       m6: '6 m', m9: '9 m',
       logS: function (a) { return a.lab + ' ' + a.n + ': entered lane ' + (a.l + 1) + ', shot from lane ' + (a.z + 1) + ', ' + a.reg + ', about ' + a.m + ' m from goal, aimed at the ' + a.goal; },
-      logO: function (a) { return a.lab + ' ' + a.n + ': entered lane ' + (a.l + 1) + ', shot from lane ' + (a.z + 1) + ', ' + a.reg + ', about ' + a.m + ' m from goal, the ball went out'; },
+      logO: function (a) { return a.lab + ' ' + a.n + ': entered lane ' + (a.l + 1) + ', shot from lane ' + (a.z + 1) + ', ' + a.reg + ', about ' + a.m + ' m from goal, the ball went out' + (a.goal ? ' (aimed at the ' + a.goal + ')' : ''); },
       logP: function (a) { return a.lab + ' ' + a.n + ': aimed at the ' + a.goal; },
       sumLine: function (s, p, f, o) { return s + ' shots' + (o ? ' (' + o + ' out)' : '') + ' · ' + p + ' P · ' + f + ' F'; }
     }
@@ -247,7 +247,7 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
     if (e.k === 'p') return { k: 'p', g: g, r: e.r === 0 ? 0 : 1 };
     if (typeof e.x !== 'number' || typeof e.y !== 'number') return null;
     var l = (typeof e.l === 'number' && e.l >= 0 && e.l <= 5) ? (e.l | 0) : (typeof e.ex === 'number' ? zoneAt(e.ex, e.ey) : 0);
-    return e.k === 'o' ? { k: 'o', x: e.x, y: e.y, l: l } : { k: e.k, x: e.x, y: e.y, l: l, g: g, r: e.k === 'f' ? (e.r === 0 ? 0 : 1) : undefined };
+    return e.k === 'o' ? { k: 'o', x: e.x, y: e.y, l: l, g: g >= 0 ? g : undefined } : { k: e.k, x: e.x, y: e.y, l: l, g: g, r: e.k === 'f' ? (e.r === 0 ? 0 : 1) : undefined };
   }
   function cleanCells(src) {
     var out = [];
@@ -398,8 +398,8 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
     Array.prototype.forEach.call(a.querySelectorAll('[data-act=res]'), function (b) { b.setAttribute('aria-pressed', String(+b.getAttribute('data-r') === c.res)); });
     a.querySelector('.rm').hidden = cs.length < 2;
     var stage = multi ? (c.lane === null ? 0 : (pd ? 2 : 1)) : 0;
-    a.querySelector('.hint').textContent = multi ? [T('hLane'), T('hPos'), T('hGoal')][stage] : T('hPen');
-    var nd = c.tool === 'o' ? 2 : 3;
+    a.querySelector('.hint').textContent = multi ? [T('hLane'), T('hPos'), T(c.tool === 'o' ? 'hGoalOut' : 'hGoal')][stage] : T('hPen');
+    var nd = 3;
     var dots = '';
     if (multi) for (var d = 0; d < nd; d++) dots += '<i class="' + (d < stage ? 'done' : (d === stage ? 'cur' : '')) + '"></i>';
     a.querySelector('.dots').innerHTML = dots;
@@ -438,7 +438,8 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
         } else if (isO) {
           marks += '<g><circle cx="' + X + '" cy="' + Y + '" r="11" stroke-width="3" style="fill:var(--card);stroke:' + col + '"/><text x="' + X + '" y="' + Y + '" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" style="fill:' + col + '">' + n + '</text><circle cx="' + (X + 9) + '" cy="' + (Y - 9) + '" r="5.5" style="fill:var(--danger)"/><text x="' + (X + 9) + '" y="' + (Y - 8.5) + '" text-anchor="middle" dominant-baseline="central" font-size="9" font-weight="700" style="fill:#fff">×</text></g>';
           sw = '<span class="sw o" style="border-color:' + col + ';color:' + col + '">' + n + '</span>';
-          txt = L.logO({ lab: T('shot'), n: n, l: e.l, z: w.z, reg: w.reg, m: w.m });
+          txt = L.logO({ lab: T('shot'), n: n, l: e.l, z: w.z, reg: w.reg, m: w.m, goal: e.g !== undefined ? GN[e.g] : '' });
+          if (e.g !== undefined) goalHits.push({ kind: 'o', lab: String(n), l: e.l, g: e.g, x: X, y: Y, ok: false });
         } else {
           marks += '<g><circle cx="' + X + '" cy="' + Y + '" r="11" stroke-width="2" style="fill:' + col + ';stroke:var(--card)"/><text x="' + X + '" y="' + Y + '" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="700" style="fill:var(--dot-ink)">' + n + '</text></g>';
           sw = '<span class="sw s" style="background:' + col + '">' + n + '</span>';
@@ -457,17 +458,17 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
       var step = Math.min(21, (GW / 3 - 12) / Math.max(tot - 1, 1));
       var r = tot <= 3 ? 9 : (tot <= 5 ? 7.5 : 6), fs = r >= 9 ? 11 : (r >= 7 ? 9.5 : 8);
       var cx = r1(GX + (col + 0.5) * GW / 3 + (k - (tot - 1) / 2) * step), cy = r1(GT + (row + 0.5) * GH / 3);
-      var tv = h.kind === 's' ? 'var(--l' + (h.l + 1) + ')' : (h.kind === 'f' ? 'var(--f)' : 'var(--p)');
-      var ink = h.kind === 's' ? 'var(--dot-ink)' : (h.kind === 'f' ? 'var(--f-ink)' : 'var(--p-ink)');
+      var tv = (h.kind === 's' || h.kind === 'o') ? 'var(--l' + (h.l + 1) + ')' : (h.kind === 'f' ? 'var(--f)' : 'var(--p)');
+      var ink = (h.kind === 's' || h.kind === 'o') ? 'var(--dot-ink)' : (h.kind === 'f' ? 'var(--f-ink)' : 'var(--p-ink)');
       if (k === 0) gCells += '<rect x="' + (GX + col * GW / 3) + '" y="' + (GT + row * GH / 3) + '" width="' + (GW / 3) + '" height="' + (GH / 3) + '" fill-opacity="0.3" style="fill:' + tv + '"/>';
       if (h.x !== undefined) gLines += '<line x1="' + h.x + '" y1="' + h.y + '" x2="' + cx + '" y2="' + cy + '" stroke-width="1.4" stroke-dasharray="4 4" stroke-opacity="0.6" style="stroke:' + tv + '"/>';
       var miss = h.ok === false;
       if (miss) ink = tv;
       var sf2 = miss ? 'var(--card)' : tv, ss = miss ? tv : 'var(--card)', sw2 = miss ? 2.2 : 1.5;
-      var shape = h.kind === 's' ? '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" stroke-width="' + sw2 + '" style="fill:' + sf2 + ';stroke:' + ss + '"/>'
+      var shape = (h.kind === 's' || h.kind === 'o') ? '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" stroke-width="' + sw2 + '" style="fill:' + sf2 + ';stroke:' + ss + '"/>'
         : (h.kind === 'f' ? '<polygon points="' + cx + ',' + r1(cy - r - 2) + ' ' + r1(cx + r + 2) + ',' + cy + ' ' + cx + ',' + r1(cy + r + 2) + ' ' + r1(cx - r - 2) + ',' + cy + '" stroke-width="' + sw2 + '" style="fill:' + sf2 + ';stroke:' + ss + '"/>'
         : '<polygon points="' + hexPts(cx, cy, r + 1) + '" stroke-width="' + sw2 + '" style="fill:' + sf2 + ';stroke:' + ss + '"/>');
-      gDots += '<g>' + shape + '<text x="' + cx + '" y="' + cy + '" text-anchor="middle" dominant-baseline="central" font-size="' + fs + '" font-weight="700" style="fill:' + ink + '">' + h.lab + '</text></g>';
+      gDots += '<g>' + shape + '<text x="' + cx + '" y="' + cy + '" text-anchor="middle" dominant-baseline="central" font-size="' + fs + '" font-weight="700" style="fill:' + ink + '">' + h.lab + '</text>' + (h.kind === 'o' ? '<circle cx="' + r1(cx + r * 0.85) + '" cy="' + r1(cy - r * 0.85) + '" r="3.8" style="fill:var(--danger)"/>' : '') + '</g>';
     });
 
     var pendMark = '';
@@ -499,7 +500,7 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
     cells().forEach(function (c, i) {
       var g = [0, 0, 0, 0, 0, 0, 0, 0, 0], ln = [0, 0, 0, 0, 0, 0], rg = [0, 0, 0], ns = 0, np = 0, nf = 0, no = 0, sp = 0, sf = 0;
       c.events.forEach(function (e) {
-        if (e.k !== 'o') g[e.g]++;
+        if (e.g !== undefined) g[e.g]++;
         if (e.k === 'p') { np++; if (e.r !== 0) sp++; return; }
         if (e.k === 's') ns++; else if (e.k === 'o') no++; else { nf++; if (e.r !== 0) sf++; }
         ln[e.l]++; rg[where(e.x, e.y).ri]++;
@@ -607,7 +608,6 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
     }
     if (!multi || c.lane === null) { if (multi) render(i); return; }
     if (p.x < XL || p.x > XR || p.y < GY || p.y > BY) return;
-    if (c.tool === 'o') { c.events.push({ k: 'o', x: r1(p.x), y: r1(p.y), l: c.lane }); touch(); render(i); return; }
     pend[i] = { sx: r1(p.x), sy: r1(p.y) };
     render(i);
   });
