@@ -148,20 +148,21 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
 #pdfRoot .ptot{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 18px}
 #pdfRoot .ptot div{border:1px solid #D3DAE1;border-top:4px solid var(--tc);border-radius:12px;padding:10px 6px 9px;text-align:center;font-size:12.5px;font-weight:600;color:#566372;background:#fff}
 #pdfRoot .ptot b{display:block;font-family:var(--font-display);font-size:32px;line-height:1.15;color:#141B24}
-#pdfRoot .ph{font-family:var(--font-display);font-size:23px;font-weight:700;margin:8px 0 12px;padding-inline-start:12px;border-inline-start:5px solid #17406B;line-height:1.2}
-#pdfRoot .sgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-#pdfRoot .scard{box-shadow:none;border:1px solid #C9D2DB;border-radius:14px;padding:12px;break-inside:avoid}
 #pdfRoot .shead{align-items:center;gap:10px}
 #pdfRoot .shead b{display:inline-grid;place-items:center;min-width:44px;height:44px;padding:0 8px;border-radius:12px;background:#17406B;color:#fff;font-size:22px}
 #pdfRoot .shead span{font-size:16px;font-weight:700;color:#141B24}
 #pdfRoot .pnote{margin:0;font-size:12.5px;color:#566372;background:#F3F6F9;border-radius:8px;padding:7px 10px;white-space:pre-wrap}
-#pdfBoard{display:flex;flex-direction:column;gap:14px;margin-bottom:10px}
-#pdfRoot #pdfBoard .card{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;align-items:start;box-shadow:none;border:1px solid #C9D2DB;border-radius:14px;padding:14px;break-inside:avoid}
-#pdfRoot #pdfBoard .shead,#pdfRoot #pdfBoard .pnote{grid-column:1/-1}
-#pdfRoot #pdfBoard .notes-head{border-top:0;padding-top:0}
 #pdfRoot .notes-head b{font-size:17px}
 #pdfRoot .log li{font-size:12px;padding:5px 0}
 #pdfRoot .sw.p,#pdfRoot .sw.f{clip-path:none;border-radius:5px}
+#pdfRoot .pstrip{display:flex;justify-content:space-between;gap:10px;background:#17406B;color:#fff;border-radius:10px;padding:9px 16px;font-size:13px;font-weight:600;margin-bottom:12px}
+#pdfRoot .pcard{border:1px solid #C9D2DB;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:14px}
+#pdfRoot .prow{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;align-items:start}
+#pdfRoot .psum{display:flex;flex-direction:column;gap:10px}
+#pdfRoot .plab{font-family:var(--font-display);font-size:19px;font-weight:700;padding:12px 12px 0 0;border-top:1px solid #D3DAE1;border-inline-start:0}
+#pdfRoot .pcols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:start}
+#pdfRoot .pcols .chips{gap:5px}
+#pdfRoot .pcols .chip{font-size:12px}
 #pdfRoot .pfoot{margin-top:16px;padding-top:10px;border-top:1px solid #D3DAE1;text-align:center;font-size:11px;color:#8896A4}
 </style>
 </head>
@@ -232,7 +233,7 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
       num: 'رقم', pos: 'المركز', shot: 'تسديدة', pen: 'ضربة جزاء', fast: 'هجمة مرتدة',
       undo: 'تراجع', clear: 'مسح', lane: 'ممر الدخول', notes: 'ملاحظات', notePh: 'اكتب ملاحظاتك هنا', empty: 'العلامات اللي هتحطها هتتكتب هنا.',
       hLane: 'اختار الممر اللي دخل منه (1 إلى 6).', hPos: 'دوس على مكان التسديدة في الملعب.', hGoal: 'دوس على المربع اللي سدد عليه في الجون.', hGoalOut: 'دوس على المربع اللي ضيّع عليه في الجون.', hPen: 'ضربة جزاء: دوس على المربع في الجون.',
-      pdfBtn: '⬇ تحميل الملخص PDF', pdfMaking: 'جاري تجهيز الـ PDF…', pdfErr: 'مقدرتش أجهز الـ PDF، تأكد من النت وجرب تاني', pdfFoot: 'اتعمل بتاريخ', pdfBoard: 'تسديدات كل لاعب', pdfLog: 'سجل التسديدات',
+      pdfBtn: '⬇ تحميل الملخص PDF', pdfMaking: 'جاري تجهيز الـ PDF…', pdfErr: 'مقدرتش أجهز الـ PDF، تأكد من النت وجرب تاني', pdfFoot: 'اتعمل بتاريخ', pdfBoard: 'تسديدات كل لاعب', pdfLog: 'سجل التسديدات', pdfSum: 'ملخص اللاعب',
       summary: 'ملخص اللاعبين', total: 'الإجمالي', goalSq: 'مربعات الجون', entry: 'ممر الدخول', dist: 'مسافة التسديد', noData: 'لسه مفيش تسديدات.', player: 'لاعب',
       reg: ['جوه الـ 6م', 'بين 6م و9م', 'بره الـ 9م'],
       goals: ['أعلى اليسار', 'أعلى المنتصف', 'أعلى اليمين', 'وسط اليسار', 'المنتصف', 'وسط اليمين', 'أسفل اليسار', 'أسفل المنتصف', 'أسفل اليمين'],
@@ -253,7 +254,7 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
       num: 'No.', pos: 'Position', shot: 'Shot', pen: 'Penalty', fast: 'Fast break',
       undo: 'Undo', clear: 'Clear', lane: 'Entry lane', notes: 'Notes', notePh: 'Write your notes here', empty: 'Marks you place are written up here.',
       hLane: 'Pick the lane he entered from (1 to 6).', hPos: 'Tap where he shot from.', hGoal: 'Tap the goal square he aimed at.', hGoalOut: 'Tap the goal square he missed at.', hPen: 'Penalty: tap the goal square.',
-      pdfBtn: '⬇ Download summary PDF', pdfMaking: 'Preparing PDF…', pdfErr: 'Could not create the PDF, check your connection and try again', pdfFoot: 'Generated on', pdfBoard: 'Shots by player', pdfLog: 'Shot log',
+      pdfBtn: '⬇ Download summary PDF', pdfMaking: 'Preparing PDF…', pdfErr: 'Could not create the PDF, check your connection and try again', pdfFoot: 'Generated on', pdfBoard: 'Shots by player', pdfLog: 'Shot log', pdfSum: 'Player summary',
       summary: 'Player summary', total: 'Total', goalSq: 'Goal squares', entry: 'Entry lane', dist: 'Shooting distance', noData: 'No shots yet.', player: 'Player',
       reg: ['inside the 6 m', 'between the 6 m and 9 m', 'outside the 9 m'],
       goals: ['top left', 'top middle', 'top right', 'middle left', 'center', 'middle right', 'bottom left', 'bottom middle', 'bottom right'],
@@ -734,28 +735,13 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
       } catch (e) { console.error(e); resolve(null); }
     });
   }
-  // keep every card / heading whole: push it to the next page when it would be cut
+  // one player per page: every player after the first starts on a fresh page
   function paginatePdf(root) {
-    var H = 1064, TOL = 4;
-    var rt = function () { return root.getBoundingClientRect().top; };
-    var els = Array.prototype.slice.call(root.querySelectorAll('.pbanner,.ptot,.ph,#pdfBoard > .card,#pdfGrid > .scard,.pfoot'));
-    var units = [];
-    els.forEach(function (el) {
-      var prev = units[units.length - 1], top = el.getBoundingClientRect().top;
-      if (el.classList.contains('scard') && prev && prev.row && Math.abs(top - prev.top0) < 3) { prev.lead.push(el); prev.all.push(el); return; }
-      units.push({ lead: [el], all: [el], row: el.classList.contains('scard'), top0: top, head: el.classList.contains('ph') });
-    });
-    for (var k = units.length - 2; k >= 0; k--) if (units[k].head) units[k].all = units[k].all.concat(units[k + 1].all);
-    units.forEach(function (u) {
-      var base = rt();
-      var t = Math.min.apply(null, u.lead.map(function (e) { return e.getBoundingClientRect().top; })) - base;
-      var b = Math.max.apply(null, u.all.map(function (e) { return e.getBoundingClientRect().bottom; })) - base;
-      if (b - t > H - TOL) return;
-      var pg = Math.floor((t + 0.5) / H);
-      if (b > (pg + 1) * H - TOL) {
-        var add = (pg + 1) * H - t;
-        u.lead.forEach(function (e) { e.style.marginTop = ((parseFloat(getComputedStyle(e).marginTop) || 0) + add) + 'px'; });
-      }
+    var H = 1064;
+    Array.prototype.forEach.call(root.querySelectorAll('.ppage'), function (el, idx) {
+      var t = el.getBoundingClientRect().top - root.getBoundingClientRect().top;
+      var r = t % H;
+      if (idx > 0 && r > 1) el.style.marginTop = (H - r) + 'px';
     });
   }
   function buildPdfDom() {
@@ -763,47 +749,68 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
     if (!host) { host = document.createElement('div'); host.id = 'pdfHost'; document.body.appendChild(host); }
     var d = new Date(), z = function (n) { return (n < 10 ? '0' : '') + n; };
     var stamp = d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate());
-    var cs = m.cells, hasBoard = cs.some(function (c) { return c.events.length; });
-    var h = '<div class="pbanner"><div><small>' + esc(T('title')) + '</small><h1>' + esc(m.name || T('untitled')) + '</h1></div>' + (m.date ? '<div class="pdate">' + esc(m.date) + '</div>' : '') + '</div>' +
+    var cs = m.cells, title = m.name || T('untitled');
+    var h = '<div class="pbanner"><div><small>' + esc(T('title')) + '</small><h1>' + esc(title) + '</h1></div>' + (m.date ? '<div class="pdate">' + esc(m.date) + '</div>' : '') + '</div>' +
       '<div class="ptot"><div style="--tc:#17406B"><b>' + document.getElementById('t-s').textContent + '</b>' + T('shots') + '</div>' +
       '<div style="--tc:#B42318"><b>' + document.getElementById('t-o').textContent + '</b>' + T('outs') + '</div>' +
       '<div style="--tc:#C2185B"><b>' + document.getElementById('t-p').textContent + '</b>' + T('pens') + '</div>' +
       '<div style="--tc:#141B24"><b>' + document.getElementById('t-f').textContent + '</b>' + T('fasts') + '</div></div>' +
-      (hasBoard ? '<h2 class="ph">' + T('pdfBoard') + '</h2><div id="pdfBoard"></div>' : '') +
-      '<h2 class="ph">' + T('summary') + '</h2>' +
-      '<div class="sgrid" id="pdfGrid">' + document.getElementById('sgrid').innerHTML + '</div>' +
-      '<div class="pfoot">' + T('pdfFoot') + ' ' + stamp + '</div>';
+      '<div id="pdfPages"></div>';
     host.innerHTML = '<div id="pdfRoot" dir="' + document.documentElement.dir + '">' + h + '</div>';
-    var root = document.getElementById('pdfRoot');
+    var root = document.getElementById('pdfRoot'), pages = document.getElementById('pdfPages'), sg = document.getElementById('sgrid').children, jobs = [], n = 0;
+    var total = cs.filter(function (c) { return c.events.length; }).length;
 
-    // top part: each player's court + log
-    var board = document.getElementById('pdfBoard'), jobs = [];
-    if (board) cards.forEach(function (a, i) {
+    cards.forEach(function (a, i) {
       var c = cs[i]; if (!c || !c.events.length) return;
-      var k = a.cloneNode(true);
-      ['.card-head', '.row', '.lanes', '.resrow', '.hintrow', 'textarea.note'].forEach(function (sel) { var n = k.querySelector(sel); if (n) n.parentNode.removeChild(n); });
-      Array.prototype.forEach.call(k.querySelectorAll('.x'), function (b) { b.parentNode.removeChild(b); });
-      k.removeAttribute('data-i');
-      var lg = k.querySelector('.notes-head b'); if (lg) lg.textContent = T('pdfLog');
+      n++;
+      var page = document.createElement('div'); page.className = 'ppage';
+      if (n > 1) {
+        var strip = document.createElement('div'); strip.className = 'pstrip';
+        strip.innerHTML = '<span>' + esc(T('title')) + ' · ' + esc(title) + '</span><span>' + (m.date ? esc(m.date) + ' · ' : '') + n + '/' + total + '</span>';
+        page.appendChild(strip);
+      }
+      var card = document.createElement('div'); card.className = 'pcard';
       var hd = document.createElement('div'); hd.className = 'shead';
       hd.innerHTML = '<b>' + (c.num ? '#' + esc(c.num) : (i + 1)) + '</b><span>' + esc(c.pos || (T('player') + ' ' + (i + 1))) + '</span>';
-      k.insertBefore(hd, k.firstChild);
-      var sv = k.querySelector('svg.court');
-      if (sv) jobs.push(rasterSvg(a.querySelector('svg.court'), root).then(function (img) {
-        if (img) sv.parentNode.replaceChild(img, sv);
-      }));
-      var note = c.note && c.note.trim();
-      if (note) { var p = document.createElement('p'); p.className = 'pnote'; p.textContent = note; k.appendChild(p); }
-      board.appendChild(k);
-    });
+      card.appendChild(hd);
 
-    // bottom part: summary cards (only players with data)
-    Array.prototype.forEach.call(root.querySelectorAll('#pdfGrid > .scard'), function (k) {
-      if (!k.querySelector('.stats')) k.parentNode.removeChild(k);
+      // court + shot log
+      var k = a.cloneNode(true), row = document.createElement('div'); row.className = 'prow';
+      var sv = k.querySelector('svg.court'), holder = document.createElement('div');
+      row.appendChild(holder);
+      if (sv) jobs.push(rasterSvg(a.querySelector('svg.court'), root).then(function (img) { holder.appendChild(img || sv); }));
+      var nt = k.querySelector('.notes');
+      if (nt) {
+        var ta = nt.querySelector('textarea'); if (ta) ta.parentNode.removeChild(ta);
+        Array.prototype.forEach.call(nt.querySelectorAll('.x'), function (b) { b.parentNode.removeChild(b); });
+        var lg = nt.querySelector('.notes-head b'); if (lg) lg.textContent = T('pdfLog');
+        row.appendChild(nt);
+      }
+      card.appendChild(row);
+
+      // summary (stats + goal squares + lanes + distance)
+      var sc = sg[i];
+      if (sc && sc.querySelector('.stats')) {
+        var sum = document.createElement('div'); sum.className = 'psum';
+        var lab = document.createElement('div'); lab.className = 'plab'; lab.textContent = T('pdfSum');
+        sum.appendChild(lab);
+        sum.appendChild(sc.querySelector('.stats').cloneNode(true));
+        var rn = sc.querySelector(':scope > p.cap'); if (rn) sum.appendChild(rn.cloneNode(true));
+        var cols = document.createElement('div'); cols.className = 'pcols';
+        Array.prototype.forEach.call(sc.children, function (el) {
+          if (el.tagName === 'DIV' && !el.classList.contains('stats') && !el.classList.contains('shead')) cols.appendChild(el.cloneNode(true));
+        });
+        sum.appendChild(cols);
+        card.appendChild(sum);
+      }
+      var note = c.note && c.note.trim();
+      if (note) { var p = document.createElement('p'); p.className = 'pnote'; p.textContent = note; card.appendChild(p); }
+      page.appendChild(card);
+      pages.appendChild(page);
     });
-    if (!root.querySelector('#pdfGrid .scard')) {
-      document.getElementById('pdfGrid').innerHTML = '<p class="sum">' + T('noData') + '</p>';
-    }
+    if (!n) pages.innerHTML = '<p class="sum">' + T('noData') + '</p>';
+    var foot = document.createElement('div'); foot.className = 'pfoot'; foot.textContent = T('pdfFoot') + ' ' + stamp;
+    (pages.lastElementChild || pages).appendChild(foot);
     return Promise.all(jobs).then(function () { paginatePdf(root); return root; });
   }
   document.getElementById('pdfBtn').addEventListener('click', function (ev) {
