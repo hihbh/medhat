@@ -164,9 +164,50 @@ textarea.note{width:100%;min-height:66px;resize:vertical}
 #pdfRoot .pcols .chips{gap:5px}
 #pdfRoot .pcols .chip{font-size:12px}
 #pdfRoot .pfoot{margin-top:16px;padding-top:10px;border-top:1px solid #D3DAE1;text-align:center;font-size:11px;color:#8896A4}
+
+/* ---- Password gate ---- */
+html.locked body>.wrap{display:none!important}
+#gate{display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;background:var(--bg);padding:20px}
+html.locked #gate{display:flex}
+#gate .box{width:100%;max-width:340px;background:var(--card);border:1px solid var(--hair);border-radius:16px;box-shadow:var(--shadow);padding:26px 22px;text-align:center}
+#gate h2{margin:0 0 6px;font-size:24px}
+#gate p{margin:0 0 16px;color:var(--muted);font-size:13.5px}
+#gate input{width:100%;text-align:center;font-size:20px;letter-spacing:4px;padding:10px 12px}
+#gate button{width:100%;margin-top:12px;padding:10px;border:0;border-radius:9px;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:700;cursor:pointer}
+#gate .err{min-height:20px;margin-top:10px;color:var(--danger);font-size:13px}
+#gate.shake .box{animation:gshake .35s}
+@keyframes gshake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
 </style>
+<script>try{if(sessionStorage.getItem("hb_auth")!=="1")document.documentElement.classList.add("locked")}catch(e){document.documentElement.classList.add("locked")}</script>
 </head>
 <body>
+<div id="gate" role="dialog" aria-modal="true" aria-labelledby="gt">
+  <form class="box" id="gform" autocomplete="off">
+    <h2 id="gt">🔒 كلمة المرور</h2>
+    <p>ادخل كلمة المرور للدخول</p>
+    <input id="gpass" type="password" inputmode="numeric" autocomplete="off" placeholder="••••••" aria-label="Password">
+    <button type="submit">دخول</button>
+    <div class="err" id="gerr" aria-live="polite"></div>
+  </form>
+</div>
+<script>
+(function(){
+  var PASS="992006";
+  var g=document.getElementById("gate"),f=document.getElementById("gform"),i=document.getElementById("gpass"),e=document.getElementById("gerr");
+  if(document.documentElement.classList.contains("locked")) setTimeout(function(){i.focus()},50);
+  f.addEventListener("submit",function(ev){
+    ev.preventDefault();
+    if(i.value===PASS){
+      try{sessionStorage.setItem("hb_auth","1")}catch(x){}
+      document.documentElement.classList.remove("locked");
+      window.dispatchEvent(new Event("resize"));
+    }else{
+      e.textContent="كلمة المرور غير صحيحة";
+      i.value="";g.classList.remove("shake");void g.offsetWidth;g.classList.add("shake");i.focus();
+    }
+  });
+})();
+</script>
 <div class="wrap" id="wrap">
   <header class="top">
     <div>
